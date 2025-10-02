@@ -1,0 +1,54 @@
+[supervisord]
+nodaemon=true
+logfile=/config/logs/supervisord.log
+pidfile=/var/run/supervisord.pid
+childlogdir=/config/logs
+
+[program:xray]
+command=/usr/local/bin/xray run -config /config/xray/config.json
+autostart=%(ENABLE_XRAY)s
+autorestart=true
+startretries=3
+stderr_logfile=/config/logs/xray.err.log
+stdout_logfile=/config/logs/xray.out.log
+
+[program:wireguard]
+command=wg-quick up wg0
+autostart=%(ENABLE_WIREGUARD)s
+autorestart=false
+startretries=1
+stderr_logfile=/config/logs/wireguard.err.log
+stdout_logfile=/config/logs/wireguard.out.log
+
+[program:openvpn]
+command=openvpn --config /config/openvpn/server.conf
+autostart=%(ENABLE_OPENVPN)s
+autorestart=true
+startretries=3
+stderr_logfile=/config/logs/openvpn.err.log
+stdout_logfile=/config/logs/openvpn.out.log
+
+[program:frp]
+command=/usr/local/bin/frps -c /config/frp/frps.ini
+autostart=%(ENABLE_FRP)s
+autorestart=true
+startretries=3
+stderr_logfile=/config/logs/frp.err.log
+stdout_logfile=/config/logs/frp.out.log
+
+[program:rustdesk]
+command=/usr/local/bin/rustdesk-server
+autostart=%(ENABLE_RUSTDESK)s
+autorestart=true
+startretries=3
+environment=KEY="%(ENV_RUSTDESK_KEY)s"
+stderr_logfile=/config/logs/rustdesk.err.log
+stdout_logfile=/config/logs/rustdesk.out.log
+
+[program:webui]
+command=python3 /webui/app.py
+autostart=%(ENABLE_WEBUI)s
+autorestart=true
+startretries=3
+stderr_logfile=/config/logs/webui.err.log
+stdout_logfile=/config/logs/webui.out.log

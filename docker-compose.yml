@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  omnigate:
+    build: .
+    container_name: omnigate
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    volumes:
+      - ./data:/config
+    environment:
+      # 基础配置
+      - DOMAIN=rustdesk.i-erp.net.cn
+      - LOG_LEVEL=info
+      
+      # 证书配置 (从 .env 文件读取)
+      - ZEROSSL_EAB_KID=${ZEROSSL_EAB_KID}
+      - ZEROSSL_EAB_HMAC_KEY=${ZEROSSL_EAB_HMAC_KEY}
+      - CLOUDFLARE_TOKEN=${CLOUDFLARE_TOKEN}
+      
+      # 服务开关
+      - ENABLE_XRAY=true
+      - ENABLE_WIREGUARD=true
+      - ENABLE_OPENVPN=true
+      - ENABLE_FRP=true
+      - ENABLE_RUSTDESK=true
+      - ENABLE_WEBUI=true
+      
+      # 各服务配置
+      - XRAY_REALITY_PORT=1121
+      - XHTTP_REALITY_PORT=1220
+      
+      - WIREGUARD_PORT=11210
+      - WIREGUARD_ADMIN_PORT=11211
+      - WIREGUARD_ADMIN_PASSWORD=${WIREGUARD_ADMIN_PASSWORD:-liyongjie}
+      - WIREGUARD_SUBNET=10.254.100.0/24
+      
+      - OPENVPN_PORT=12200
+      - OPENVPN_USERNAME=${OPENVPN_USERNAME:-liyongjie}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD:-liyongjie}
+      - OPENVPN_SUBNET=10.250.254.0/24
+      
+      - FRP_SERVER_PORT=7000
+      - FRP_ADMIN_PORT=7500
+      - FRP_ADMIN_PASSWORD=${FRP_ADMIN_PASSWORD:-liyongjie}
+      
+      - RUSTDESK_KEY=${RUSTDESK_KEY:-liyongjie}
+      
+      # 高级配置
+      - IPV6_SUPPORT=true
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv6.conf.all.forwarding=1
+    labels:
+      - "description=OmniGate - Omnipotent Network Gateway"
+      - "version=1.0.0"

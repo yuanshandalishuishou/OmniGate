@@ -1,0 +1,32 @@
+我想借鉴网上其他人编写的几个docker环境下的xray程序，加上wireguard和openvpn功能，以及rustdesk和frp服务器等功能，整合成一个docker 镜像。
+一、该镜像的默认参数（运行时可以通过-e设置）有：
+1、域名（默认rustdesk.i-erp.net.cn)
+2、证书申请时使用dns的方式获取，ZeroSSL Eab Kid:DlGziSwo5-B-1kce0Gf6iA  eab HMAC key:ojYxbBgnw-zNCe1Ie_fQEb9LYynsPloxGU1gDRueCyhwqlHPWOcEDw-FHyddnf8E_ouS4Cw_r3J2GLh55T5vGg
+    cloudflare.com令牌:Gja-C1ecYycpiLtSIy3dPUU9ZiwduKikRF4S2ZOI 相关重要参数通过环境变量传入，不要硬编码在镜像中
+    证书到期前自动更新。证书默认存放在镜像的/config/cert子目录供其他程序使用。
+3、openvpn的默认用户名liyongjie密码liyongjie
+4、xray_reality服务的端口为1121
+5、xhttp_reality服务的端口为1220
+6、wireguard服务端口为11210，管理页面的端口为11211以及管理密码为liyongjie
+7、openvpn服务端口为12200
+8、frp服务器远程访问端口为7000，web管理界面端口为7500，默认密码为liyongjie
+9、rustdesk服务器使用官方建议配置
+10、各个服务的日志级别
+11、是否启用某个服务（可能用户不需要全部服务）
+12、WIREGUARD_SUBNET（默认10.254.100.0/24）、OPENVPN_SUBNET（默认10.250.254.0/24）
+13、RUSTDESK_KEY（中继服务器密钥）默认liyongjie
+14、进行数据持久化。
+二、镜像文件相关情况
+1、debian12为基础镜像。主机环境中，要添加和开启BBR以及网络加速、ipv4和ipv6路由转发功能；
+2、xray_reality及xhttp_reality中不需要人工干预，uuid等自动生成；
+     reality协议公钥和私钥自动生成？如何将公钥提供给客户端？
+3、wireguard和openvpn可以通过docker的bash添加用户名和密码
+4、xray_reality和xhttp_reality的配置借鉴https://github.com/wulabing/xray_docker
+    wireguard的配置借鉴weejewel/wg-easy镜像中的设置。
+5、日志要完善，要能显示所有的配置参数（包括每一个服务所有开放的端口、reality公钥、frp密码、wireguard和的管理地址、rustdesk服务器的admin密码和管理后台和key等全部可用的信息，这些信息按照功能进行归类并有序显示）以及详细的运行情况。
+6、要确保镜像文件尽可能的小，使用多阶段构建或者优化。
+7、容器内，需要有一个主进程管理（如supervisord）来管理所有服务的启动和停止。某个服务失败，不影响其他服务。增加一个web界面，统一管理这些服务（配置、用户、状态等）。
+8、默认密码：强制要求用户修改，或首次运行时设置。
+9、是否支持IPv6
+10、容器网络模式：bridge
+
