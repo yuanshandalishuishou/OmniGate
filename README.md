@@ -42,7 +42,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/your-username/omnigate.git
+git https://github.com/yuanshandalishuishou/OmniGate
 cd omnigate
 
 # 配置环境变量
